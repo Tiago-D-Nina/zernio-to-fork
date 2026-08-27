@@ -1,0 +1,206 @@
+/* Viver de IA · acabamento canônico dos primitives Radix/shadcn. */
+
+.via-dialog-overlay {
+  background:
+    radial-gradient(circle at 50% 30%, rgba(10, 31, 59, 0.42), rgba(10, 31, 59, 0.58));
+  backdrop-filter: blur(10px) saturate(120%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+}
+
+body:has(.via-dialog-overlay) .app-sidebar-toggle {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.via-dialog-content,
+.via-popover-content,
+.via-select-content,
+.via-sheet-content {
+  border: var(--via-glass-ring);
+  background: var(--via-glass-bar);
+  backdrop-filter: blur(28px) saturate(145%);
+  -webkit-backdrop-filter: blur(28px) saturate(145%);
+  box-shadow:
+    inset 0 1px 0 var(--via-edge-hi),
+    0 32px 90px -32px var(--via-shadow-ink-60);
+}
+
+.via-dialog-content {
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: var(--via-radius-lg);
+  background: var(--via-glass-card);
+  box-shadow:
+    inset 0 1px 0 var(--via-edge-hi),
+    0 0 0 0.5px var(--via-navy-08),
+    0 32px 64px -22px var(--via-shadow-ink-40),
+    0 16px 36px -12px var(--via-shadow-ink-20);
+}
+
+.via-dialog-content::before,
+.via-sheet-content::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background:
+    radial-gradient(560px 240px at 0% 0%, var(--via-navy-06), transparent 64%),
+    radial-gradient(440px 220px at 100% 100%, var(--via-navy-03), transparent 68%);
+  pointer-events: none;
+}
+
+.via-dialog-close {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: var(--via-radius-sm);
+  background: transparent;
+  color: var(--via-text-muted);
+  cursor: pointer;
+  transition:
+    color var(--via-dur) var(--via-ease-snap),
+    background var(--via-dur) var(--via-ease-snap),
+    transform var(--via-dur) var(--via-ease-snap);
+}
+
+.via-dialog-close:hover {
+  border-color: var(--via-border-soft);
+  background: linear-gradient(180deg, var(--via-navy-06), var(--via-navy-03));
+  color: var(--via-text-primary);
+  transform: rotate(90deg);
+}
+
+.via-dialog-close:focus-visible {
+  outline: none;
+  box-shadow: var(--via-shadow-focus);
+}
+
+.via-dialog-title {
+  color: var(--via-text-primary);
+  font-family: var(--via-font-display);
+  font-size: 20px;
+  font-weight: var(--via-fw-medium);
+  line-height: 1.1;
+  letter-spacing: -0.028em;
+}
+
+.via-card-shell {
+  position: relative;
+  border: var(--via-glass-ring);
+  border-radius: var(--via-radius-lg);
+  background: var(--via-glass-card);
+  backdrop-filter: var(--via-glass-blur);
+  -webkit-backdrop-filter: var(--via-glass-blur);
+  box-shadow: var(--via-glass-shadow);
+}
+
+.via-tabs-list {
+  gap: var(--via-space-0_5);
+  border: 0.5px solid var(--via-navy-08);
+  border-radius: var(--via-radius-sm);
+  background: linear-gradient(180deg, var(--via-navy-04), var(--via-navy-02));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow:
+    inset 0 1px 0 var(--via-edge-hi),
+    0 8px 20px -18px var(--via-shadow-ink-20);
+}
+
+.via-tabs-trigger {
+  border: 0;
+  border-radius: var(--via-radius-xs);
+  background: transparent;
+  color: var(--via-text-muted);
+  cursor: pointer;
+  transition:
+    color var(--via-dur) var(--via-ease-snap),
+    background var(--via-dur) var(--via-ease-snap),
+    box-shadow var(--via-dur) var(--via-ease-snap);
+}
+
+.via-tabs-trigger:hover {
+  color: var(--via-text-primary);
+}
+
+.via-tabs-trigger[data-state='active'] {
+  background: var(--via-glass-card-2);
+  color: var(--via-text-primary);
+  box-shadow:
+    inset 0 1px 0 var(--via-edge-hi),
+    0 5px 12px -9px var(--via-shadow-ink-24);
+}
+
+.via-tabs-trigger:focus-visible {
+  outline: none;
+  box-shadow: var(--via-shadow-focus);
+}
+
+.via-select-trigger,
+.via-textarea {
+  border: var(--via-glass-ring);
+  border-radius: var(--via-radius-md);
+  background: var(--via-glass-card-2);
+  box-shadow:
+    inset 0 1px 0 var(--via-edge-hi),
+    0 3px 10px -9px var(--via-shadow-ink-20);
+  transition:
+    border-color var(--via-dur) var(--via-ease-snap),
+    box-shadow var(--via-dur) var(--via-ease-snap);
+}
+
+.via-select-trigger:focus-visible,
+.via-textarea:focus-visible {
+  outline: none;
+  border-color: var(--via-navy-24);
+  box-shadow: var(--via-shadow-focus);
+}
+
+.via-select-content,
+.via-popover-content {
+  border-radius: var(--via-radius-md);
+}
+
+.via-select-item {
+  border-radius: var(--via-radius-sm);
+  transition:
+    color var(--via-dur-fast) var(--via-ease-snap),
+    background var(--via-dur-fast) var(--via-ease-snap);
+}
+
+.via-select-item:hover,
+.via-select-item:focus {
+  background: var(--via-navy-06);
+  color: var(--via-text-primary);
+}
+
+.via-sheet-content {
+  overflow: hidden;
+  background: var(--via-glass-bar);
+}
+
+@media (max-width: 640px) {
+  .via-dialog-content {
+    width: calc(100% - 24px);
+    max-height: calc(100svh - 24px);
+    padding: 22px 18px;
+    border-radius: var(--via-radius-lg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .via-dialog-close,
+  .via-tabs-trigger,
+  .via-select-trigger,
+  .via-textarea,
+  .via-select-item {
+    transition: none;
+  }
+
+  .via-dialog-close:hover {
+    transform: none;
+  }
+}

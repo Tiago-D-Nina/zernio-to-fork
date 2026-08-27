@@ -1,0 +1,404 @@
+/*
+ * Viver de IA · Design System v0.6.1
+ * =============================================================
+ * A fonte de verdade das cores é src/styles/via-tokens.css — cópia literal
+ * de src/styles/tokens.css do reference site (rafaelmilagre7/viver-de-ia-ds).
+ * Atualizar o DS = recopiar aquele arquivo. Nada de editar tokens lá dentro.
+ *
+ * Este arquivo faz três coisas, nesta ordem:
+ *   1. PONTE   · traduz os tokens --via-* (hex/rgba) para o contrato do
+ *                shadcn/Tailwind (canais HSL crus), preservando os
+ *                modificadores de opacidade (bg-primary/10, bg-card/50…).
+ *                Sem os canais crus, `hsl(var(--x) / 0.1)` não compila e
+ *                todo fundo translúcido do app morre.
+ *   2. BASE    · reaplica as regras de elemento do DS que o preflight do
+ *                Tailwind zera (body, headings, links).
+ *   3. APP     · o que um dashboard precisa e um site editorial não:
+ *                densidade de linha, scrollbar, foco.
+ *
+ * Tema: light-first (padrão da casa). O escuro é o dark oficial do DS e
+ * responde a DOIS seletores ao mesmo tempo — `[data-theme="dark"]` (VIA) e
+ * `.dark` (Tailwind/shadcn). O ThemeProvider escreve os dois no <html>.
+ */
+
+@import './styles/via-tokens.css';
+@import './styles/via-surfaces.css';
+@import './styles/via-data.css';
+@import './styles/via-primitives.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =============================================================
+   1 · PONTE DE TOKENS · --via-* → contrato shadcn (HSL cru)
+   Os valores abaixo são os hex canônicos do DS convertidos para
+   canais HSL. Cada linha traz o token VIA de origem no comentário:
+   se o DS mudar, a origem diz o que reconverter.
+   ============================================================= */
+@layer base {
+  :root {
+    /* A família instalada é a variable do fontsource ("Geist Variable"),
+       não a "Geist" do Google Fonts que o DS assume. Reaponta as três. */
+    --via-font-display: 'Geist Variable', 'Geist', system-ui, -apple-system, sans-serif;
+    --via-font: 'Geist Variable', 'Geist', system-ui, -apple-system, sans-serif;
+    --via-font-mono: 'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace;
+
+    --background: 0 0% 100%; /* --via-bg · white */
+    --foreground: 214 71% 13.5%; /* --via-text-primary · navy #0A1F3B */
+    --card: 0 0% 100%; /* --via-surface */
+    --card-foreground: 214 71% 13.5%;
+    --popover: 0 0% 100%; /* --via-surface-elev */
+    --popover-foreground: 214 71% 13.5%;
+    --primary: 214 71% 13.5%; /* --via-navy · única cor de marca */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 23.1% 97.5%; /* --via-gray-50 #F7F8FA */
+    --secondary-foreground: 218 23.5% 26.7%; /* --via-gray-700 */
+    --muted: 216 20% 95.1%; /* --via-gray-100 #F0F2F5 */
+    --muted-foreground: 219 15.1% 36.5%; /* --via-text-muted #4F596B */
+    /* Quarto degrau da escala de texto. Existe para que de-ênfase seja feita
+       por COR, não por opacity — opacity compõe com o fundo e derruba o
+       contraste. Vale o --via-text-soft e NÃO o --via-text-faint: o faint
+       (gray-400) rende 2.58:1 sobre branco, reprovado em AA para texto e
+       até para ícone essencial. O soft mantém a hierarquia e passa (5.21:1). */
+    --faint: 219 12.8% 44.5%; /* --via-text-soft #636D80 */
+    --accent: 218 17.4% 91%; /* --via-gray-200 #E4E7EC */
+    --accent-foreground: 214 71% 13.5%;
+    /* Coral e success levam meio ponto de luminosidade a menos que o hex
+       canônico (54.1→53.6 e 33.1→32.1). Motivo: no DS eles pintam superfície
+       e bolinha de presença; aqui viram TEXTO de status, e nos valores
+       originais paravam em 4.45:1 e 4.34:1 — abaixo de AA. Mesmo matiz,
+       mesma saturação, diferença imperceptível, agora 4.53:1 e 4.57:1. */
+    --destructive: 0 39.3% 53.6%; /* --via-coral #B85C5C · destrutivo real */
+    --destructive-foreground: 0 0% 100%;
+    --success: 154 63.3% 32.1%; /* --via-success #1F8A5B · presença/estado ok */
+    --success-foreground: 0 0% 100%;
+    --border: 218 17.4% 91%; /* --via-border-hairline · gray-200 */
+    --input: 217 16% 84.1%; /* --via-gray-300 */
+    --ring: 214 52% 24.5%; /* --via-blue #1E3A5F */
+
+    /* Raio: componentes shadcn que leem --radius direto (sidebar) pegam o
+       mesmo valor de `rounded-lg`, que o tailwind.config aponta pro md do
+       DS — o degrau de botão/input/card pequeno. */
+    --radius: var(--via-radius-md); /* 14px */
+
+    /* Sidebar · navy sólido nos dois temas (a marca de pé no chrome) */
+    --sidebar-background: 214 71% 13.5%; /* --via-navy */
+    --sidebar-foreground: 217 16% 84.1%; /* --via-gray-300 */
+    --sidebar-primary: 0 0% 100%;
+    --sidebar-primary-foreground: 214 71% 13.5%;
+    --sidebar-accent: 212 44.7% 29.8%; /* --via-blue-soft */
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 214 52% 24.5%; /* --via-blue */
+    --sidebar-ring: 213 27.8% 66.9%;
+
+    /* Data-viz · rampa monocromática do DS (--via-chart-1..5).
+       Regra da casa: 3+ séries NÃO ganham cor nova — usar small multiples. */
+    --chart-1: 214 71% 13.5%;
+    --chart-2: 213 40.7% 33.7%;
+    --chart-3: 213 25.4% 49.4%;
+    --chart-4: 213 27.8% 66.9%;
+    --chart-5: 214 26.9% 81.8%;
+
+    /* Profundidade do produto. O DS canônico é white-first, mas o vidro só
+       aparece quando existe contraste atrás dele. Estes aliases não mudam
+       os tokens oficiais: combinam os próprios degraus VIA em três níveis
+       claros — canvas, painel e well interno — e resolvem dark sozinhos. */
+    --via-app-canvas:
+      linear-gradient(180deg, var(--via-gray-100) 0%, var(--via-gray-50) 44%, var(--via-gray-100) 100%);
+    --via-app-panel-ring: 1px solid var(--via-navy-10);
+    --via-app-panel-shadow:
+      inset 0 1px 0 var(--via-edge-hi),
+      0 18px 44px -28px var(--via-shadow-ink-30),
+      0 3px 12px -7px var(--via-shadow-ink-10);
+    --via-app-panel-shadow-lift:
+      inset 0 1px 0 var(--via-edge-hi),
+      0 28px 58px -28px var(--via-shadow-ink-40),
+      0 8px 20px -12px var(--via-shadow-ink-14);
+    --via-app-well:
+      linear-gradient(180deg, var(--via-navy-04), var(--via-navy-02));
+    --via-app-well-ring: 1px solid var(--via-navy-08);
+  }
+
+  /* Dark oficial do DS. Os dois seletores existem de propósito: o VIA
+     resolve por [data-theme], o Tailwind por .dark — e o app usa os dois. */
+  :root[data-theme='dark'],
+  .dark {
+    --background: 220 48.8% 8.4%; /* --via-bg #0B1220 · warm dark */
+    --foreground: 220 37.5% 96.9%; /* --via-text-primary #F4F6FA */
+    --card: 221 43.3% 13.1%; /* --via-surface #131C30 */
+    --card-foreground: 220 37.5% 96.9%;
+    --popover: 220 40% 17.6%; /* --via-surface-elev #1B273F */
+    --popover-foreground: 220 37.5% 96.9%;
+    /* No escuro o navy vira fundo, não destaque: primary sobe pra um azul
+       claro que passa AA como texto e como preenchimento. */
+    --primary: 215 33.8% 74.5%; /* --via-chart-3 dark #A8BAD4 */
+    --primary-foreground: 220 48.8% 8.4%;
+    --secondary: 222 46.4% 11%; /* --via-gray-50 dark #0F1729 */
+    --secondary-foreground: 217 16% 84.1%;
+    --muted: 223 43.2% 15.9%; /* --via-gray-100 dark #17213A */
+    --muted-foreground: 215 17.4% 72.9%; /* --via-text-muted dark #AEB8C6 */
+    --faint: 218 14.5% 66.1%; /* --via-text-faint dark #9CA5B5 · 7.56:1, AA */
+    --accent: 220 40% 17.6%; /* --via-bg-3 */
+    --accent-foreground: 220 37.5% 96.9%;
+    --destructive: 0 62.6% 75.9%; /* --via-coral-dark #E89B9B · clareia p/ legibilidade */
+    --destructive-foreground: 220 48.8% 8.4%;
+    /* O DS não redefine --via-success no escuro porque lá ele só pinta
+       bolinha de presença. Aqui vira texto e ícone de estado, então
+       clareia seguindo a mesma lógica de coral-dark/danger no dark. */
+    --success: 154 48% 52%;
+    --success-foreground: 220 48.8% 8.4%;
+    --border: 220 40% 17.6%;
+    --input: 220 40% 22%;
+    --ring: 215 33.8% 74.5%;
+
+    /* Sidebar mantém navy — um passo abaixo do canvas pra separar do conteúdo */
+    --sidebar-background: 222 46.4% 11%; /* --via-gray-50 dark */
+    --sidebar-foreground: 215 17.4% 72.9%;
+    --sidebar-primary: 215 33.8% 74.5%;
+    --sidebar-primary-foreground: 220 48.8% 8.4%;
+    --sidebar-accent: 220 40% 17.6%;
+    --sidebar-accent-foreground: 220 37.5% 96.9%;
+    --sidebar-border: 220 40% 17.6%;
+    --sidebar-ring: 215 33.8% 74.5%;
+
+    --chart-1: 214 31.8% 56.9%; /* --via-chart-* dark · rampa clara */
+    --chart-2: 215 32.6% 65.7%;
+    --chart-3: 215 33.8% 74.5%;
+    --chart-4: 215 33.3% 82.9%;
+    --chart-5: 215 37.8% 91.2%;
+
+    --via-app-canvas:
+      linear-gradient(180deg, var(--via-bg) 0%, var(--via-bg-2) 46%, var(--via-bg) 100%);
+  }
+}
+
+/* =============================================================
+   2 · BASE · o preflight do Tailwind roda depois do @import e zera
+   as regras de elemento do DS (body, h1-h4, a). Reaplicadas aqui.
+   ============================================================= */
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-family: var(--via-font);
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--via-font);
+    /* O DS usa 1.65 (ritmo editorial). Um painel é denso: 1.5 mantém
+       a leitura confortável sem esticar tabela, lista e formulário. */
+    line-height: var(--via-lh-normal);
+    letter-spacing: -0.011em;
+  }
+
+  /* Onde o componente não passa classe de tamanho, o heading cai na
+     escala do DS em vez do "inherit" do preflight. */
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: var(--via-text-primary);
+    letter-spacing: var(--via-ls-tighter);
+  }
+  h3,
+  h4 {
+    letter-spacing: var(--via-ls-tight);
+  }
+
+  /* Regra da casa: link em texto corrido é sublinhado. Links que já
+     carregam classe própria (nav, botão, card clicável) ficam de fora. */
+  a:not([class]) {
+    color: hsl(var(--primary));
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  button,
+  a,
+  input,
+  textarea,
+  select {
+    transition: color var(--via-dur) var(--via-ease-snap),
+      background-color var(--via-dur) var(--via-ease-snap),
+      border-color var(--via-dur) var(--via-ease-snap);
+  }
+}
+
+/* =============================================================
+   3 · APP · acabamento que o painel usa e o reference site não tem
+   ============================================================= */
+@layer components {
+  /* Pill canônica · 11px · 500 · -0.004em · nowrap · sem dot · sem caps lock */
+  .via-pill {
+    @apply inline-flex items-center whitespace-nowrap rounded-full px-[11px] py-1 text-[11px] font-medium;
+    letter-spacing: -0.004em;
+  }
+
+  /* Eyebrow · rótulo de seção em mono small caps (assinatura editorial VIA).
+     Cor no degrau `faint` do app (= --via-text-soft), não no --via-text-faint
+     do DS: a 10px o gray-400 não passa AA sobre branco. */
+  .via-eyebrow {
+    font-family: var(--via-font-mono);
+    font-size: var(--via-fs-micro);
+    font-weight: var(--via-fw-medium);
+    letter-spacing: var(--via-ls-wide);
+    text-transform: uppercase;
+    color: hsl(var(--faint));
+  }
+
+  /* Card glass · a receita inteira do DS (superfície + anel + linha de luz
+     no topo + sombra navy). Sombra sempre em --via-shadow-ink-*: token
+     navy em box-shadow vira halo branco no escuro. */
+  .via-card {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background:
+      radial-gradient(540px 240px at 0% 0%, var(--via-navy-06), transparent 60%),
+      radial-gradient(420px 220px at 100% 100%, var(--via-navy-03), transparent 66%),
+      var(--via-glass-card);
+    backdrop-filter: var(--via-glass-blur);
+    -webkit-backdrop-filter: var(--via-glass-blur);
+    border: var(--via-app-panel-ring);
+    border-radius: var(--via-radius-lg);
+    box-shadow: var(--via-app-panel-shadow);
+    transition:
+      transform 260ms var(--via-ease-snap),
+      box-shadow 260ms ease,
+      border-color 260ms ease;
+  }
+
+  .via-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background:
+      linear-gradient(90deg, transparent, var(--via-edge-hi) 50%, transparent) top / calc(100% - 52px) 1px no-repeat;
+    opacity: 0.8;
+    pointer-events: none;
+    transition: opacity 260ms ease;
+  }
+
+  .via-card:hover::before {
+    opacity: 1;
+  }
+
+  /* Hover signature · lift sutil, borda que acorda. Nunca barra lateral
+     colorida: a borda fina é uniforme nos 4 lados. */
+  .via-card--lift {
+    transition: transform var(--via-dur) var(--via-ease-snap),
+      box-shadow var(--via-dur) var(--via-ease-snap),
+      border-color var(--via-dur) var(--via-ease-snap);
+  }
+  .via-card--lift:hover {
+    transform: translateY(-1px);
+    border-color: var(--via-navy-20);
+    box-shadow: inset 0 1px 0 var(--via-edge-hi),
+      0 24px 56px -20px var(--via-shadow-ink-20),
+      0 4px 12px -6px var(--via-shadow-ink-08, var(--via-shadow-ink-06));
+  }
+
+  /* A mesma separação material vale para primitives e estruturas de dados
+     fora do Dashboard. A borda continua uniforme nos quatro lados. */
+  .via-card-shell,
+  .via-tile,
+  .via-row-card,
+  .via-metric,
+  .via-table-wrap {
+    border: var(--via-app-panel-ring);
+    box-shadow: var(--via-app-panel-shadow);
+  }
+
+  .via-metric {
+    background:
+      radial-gradient(340px 180px at 100% 0%, var(--via-navy-05), transparent 58%),
+      var(--via-glass-card);
+  }
+
+  /* CTA primário · a receita do DS por inteiro: navy com gradiente, linha de
+     luz no topo, sombra ink. Navy nos DOIS temas (--via-navy não adapta) —
+     o que separa do fundo escuro é a luz inset e a borda, não a cor. */
+  .via-btn-primary {
+    background: linear-gradient(180deg, var(--via-navy), var(--via-navy-deep));
+    border: 1px solid var(--via-navy);
+    color: var(--via-white);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.18) inset,
+      0 -1px 0 rgba(0, 0, 0, 0.1) inset, 0 8px 18px -6px var(--via-shadow-ink-40);
+  }
+  .via-btn-primary:hover:not(:disabled) {
+    transform: translateY(-1px);
+    filter: brightness(1.06);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.22) inset,
+      0 -1px 0 rgba(0, 0, 0, 0.1) inset, 0 14px 28px -8px var(--via-shadow-ink-60),
+      0 4px 12px -4px var(--via-shadow-ink-30);
+  }
+  .via-btn-primary:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px -2px var(--via-shadow-ink-40) inset,
+      0 4px 10px -6px var(--via-shadow-ink-40);
+  }
+  /* No escuro o navy encosta no canvas: a borda clara devolve o contorno. */
+  :root[data-theme='dark'] .via-btn-primary,
+  .dark .via-btn-primary {
+    border-color: var(--via-blue-soft);
+  }
+
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 3px;
+  }
+}
+
+/* Scrollbar global */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.4);
+}
+
+/* Foco visível · anel do DS */
+*:focus-visible {
+  @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+}
+
+/* Radix move o foco para o tabpanel ao trocar de aba. O anel global em um
+   painel inteiro parece uma borda de erro; o gatilho da aba já mantém o
+   indicador de foco acessível. */
+[role='tabpanel']:focus-visible {
+  box-shadow: none;
+}
+
+/* Respeita quem pediu menos movimento no sistema */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

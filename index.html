@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nina · SDR com IA</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <meta name="description" content="Nina — agente de SDR com IA para WhatsApp e Instagram. Qualifica leads, agenda reuniões e responde com base no conhecimento do seu negócio.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Nina · SDR com IA">
+    <meta property="og:description" content="Agente de SDR com IA para WhatsApp e Instagram.">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Nina · SDR com IA">
+    <meta name="twitter:description" content="Agente de SDR com IA para WhatsApp e Instagram.">
+    <script>
+      // Resolve o tema ANTES do primeiro paint. Sem isto o app pinta claro,
+      // o React monta e troca pra escuro — o flash branco clássico.
+      // Mantém a mesma chave e a mesma dupla de marcadores do useTheme.tsx.
+      (function () {
+        try {
+          var stored = localStorage.getItem('nina-theme');
+          var mode = stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'light';
+          var dark =
+            mode === 'dark' ||
+            (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          if (dark) {
+            document.documentElement.classList.add('dark');
+            document.documentElement.setAttribute('data-theme', 'dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.setAttribute('data-theme', 'light');
+          }
+        } catch (e) {
+          /* localStorage bloqueado (modo privado/iframe): segue no claro, que é o padrão da marca */
+        }
+      })();
+    </script>
+  </head>
+  <body class="min-h-screen bg-background font-sans antialiased">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
